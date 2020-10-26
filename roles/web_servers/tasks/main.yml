@@ -1,0 +1,17 @@
+- name: install apache2 and php package for U
+  tags: apache
+  package:
+      name:
+        - "{{ apache_package }}"
+        - "{{ php_package }}"
+      state: latest
+      update_cache: yes
+
+- name: copy default html file
+  tags: apache
+  copy:
+    src: default_site.html
+    dest: /var/www/html/index.html
+    owner: root
+    group: root
+    mode: 0644
