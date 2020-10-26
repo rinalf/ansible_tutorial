@@ -1,1 +1,2 @@
-test@192.168.1.66
+[web_servers]
+test@192.168.1.66 apache_package=apache2 php_package=libapache2-mod-php
