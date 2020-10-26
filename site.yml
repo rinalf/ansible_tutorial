@@ -4,11 +4,11 @@
   become: true
   pre_tasks:
 
-  - name: install updates (Ubuntu)
-    apt:
-      upgrade: dist
-      update_cache: yes
-    when: ansible_distribution == "Ubuntu"
+#  - name: install updates (Ubuntu)
+#    apt:
+#      upgrade: dist
+#      update_cache: yes
+#    when: ansible_distribution == "Ubuntu"
 
 
 - hosts: web_servers
@@ -24,11 +24,35 @@
       state: latest
       update_cache: yes
 
+  - name: start apache
+    tags: apache
+    service:
+      name: apache2
+      state: started
+      enabled: yes
+    when: ansible_distribution == "Ubuntu"
+
   - name: install samba package
     tags: samba
     package:
       name: samba
       state: latest
+
+  - name: change email
+    tags: apache
+    lineinfile:
+      path: /etc/apache2/sites-available/000-default.conf
+      regexp: '^ServerAdmin'
+      line: ServerAdmin test@testing.com
+    when: ansible_distribution == "Ubuntu"
+    register: apache2
+
+  - name: restart apache
+    tags: apache
+    service:
+      name: apache2
+      state: restarted
+    when: apache2.changed
 
   - name: copy default html file
     tags: apache
@@ -43,11 +67,11 @@
     package:
       name: unzip
 
-  - name: install terraform
-    unarchive:
-      src: https://releases.hashicorp.com/terraform/0.13.5/terraform_0.13.5_linux_amd64.zip
-      dest: /usr/local/bin
-      remote_src: yes
-      mode: 0755
-      owner: root
-      group: root
+#  - name: install terraform
+#    unarchive:
+#      src: https://releases.hashicorp.com/terraform/0.13.5/terraform_0.13.5_linux_amd64.zip
+#      dest: /usr/local/bin
+#      remote_src: yes
+#      mode: 0755
+#      owner: root
+#      group: root
